@@ -56,7 +56,8 @@ public class Weapon : MonoBehaviour {
 			Debug.Log (hit.transform.name + " FOUND");
 		}
 
-		anim.SetBool ("Fire", true);
+		anim.CrossFadeInFixedTime ("Fire", 0.1f);
+		//anim.SetBool ("Fire", true);
 		currentBullets--;
 		fireTimer = 0.0f; //Reset Fire Timer
 	}
