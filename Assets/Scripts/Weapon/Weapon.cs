@@ -22,6 +22,7 @@ public class Weapon : MonoBehaviour {
 
 	float fireTimer; // Time counter for the delay
 
+	private bool isReloading = false;
 	// Use this for initialization
 	void Start () {
 		anim = GetComponent<Animator> ();
@@ -34,10 +35,14 @@ public class Weapon : MonoBehaviour {
 	void Update () {
 
 		if (Input.GetButton ("Fire1")) {
-			// print("FIRED");
-			Fire (); //Execute the fire function if we press/hold the left mouse button
+			if(currentBullets > 0) Fire (); //Execute the fire function if we press/hold the left mouse button
+			// else // play no clip sound
 		}
 
+		if (Input.GetKeyDown(KeyCode.R)){
+			if(currentBullets < bulletsPerMag && bulletsLeft > 0)
+			DoReload();
+		}
 		if (fireTimer < fireRate) {
 			fireTimer += Time.fixedDeltaTime; //Add into time counter
 		}
@@ -47,11 +52,12 @@ public class Weapon : MonoBehaviour {
 	void FixedUpdate(){
 		AnimatorStateInfo info = anim.GetCurrentAnimatorStateInfo (0);
 
+		isReloading = info.IsName("Reload");
 		// if (info.IsName ("Fire")) anim.SetBool ("Fire", false);
 	}
 
 	private void Fire(){
-		if (fireTimer < fireRate || currentBullets <= 0)
+		if (fireTimer < fireRate)
 			return;
 
 		RaycastHit hit;
@@ -61,11 +67,29 @@ public class Weapon : MonoBehaviour {
 		}
 
 		anim.CrossFadeInFixedTime ("Fire", 0.1f);
-		muzzleFlash.Play();
-		_AudioSource.PlayOneShot(shootSound, 0.7f);
+		muzzleFlash.Play(); // show muzzle flash
+		_AudioSource.PlayOneShot(shootSound, 0.7f); // play shooting sound at 0.0f - 1.0f volume
 
 		//anim.SetBool ("Fire", true);
 		currentBullets--;
 		fireTimer = 0.0f; //Reset Fire Timer
+	}
+
+	private void Reload(){
+		if(bulletsLeft <= 0) return;
+
+		int bulletsToLoad = bulletsPerMag - currentBullets;
+		int bulletsToDeduct = (bulletsLeft >= bulletsToLoad) ? bulletsToLoad : bulletsLeft;
+
+		bulletsLeft -= bulletsToDeduct;
+		currentBullets += bulletsToDeduct;
+	}
+
+	private void DoReload(){
+		AnimatorStateInfo info = anim.GetCurrentAnimatorStateInfo (0);
+
+		if(isReloading) return;
+
+		anim.CrossFadeInFixedTime("Reload", 0.01f);
 	}
 }
