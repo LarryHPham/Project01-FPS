@@ -62,15 +62,10 @@ public class Weapon : MonoBehaviour {
 
 		anim.CrossFadeInFixedTime ("Fire", 0.1f);
 		muzzleFlash.Play();
-		PlayShootSound();
+		_AudioSource.PlayOneShot(shootSound, 0.7f);
 
 		//anim.SetBool ("Fire", true);
 		currentBullets--;
 		fireTimer = 0.0f; //Reset Fire Timer
-	}
-
-	private void PlayShootSound(){
-		// _AudioSource.clip = shootSound;
-		_AudioSource.PlayOneShot(shootSound, 0.7f);
 	}
 }
